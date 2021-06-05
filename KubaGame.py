@@ -4,6 +4,8 @@
 #               marbles or by blocking your oppoenent from any remaining moves. The board can be
 #               displayed in the console for debug purposes.
 
+from copy import deepcopy
+
 class KubaGame:
     '''
     Represents the game "Kuba".
@@ -19,7 +21,8 @@ class KubaGame:
         - Returning the total number of all colored marbles on the game board.
         - Displaying the board in the console.
 
-    Class Dependencies: Player
+    Class Dependencies: 
+        - Player: used to track the number of red marbles per player
     '''
 
     def __init__(self, player1, player2):
@@ -28,12 +31,11 @@ class KubaGame:
         of length two with the first value the player name and the second the color
         represented as either "W" or "B".
 
-        The board is initialized per the game rules with R, B, and W representing the different
-        colored marbles and X for empty spots on the board.
+        The board is initialized per the game rules with R (red), B (black), and W (white) representing
+        the different colored marbles and X for empty spots on the board.
         '''
 
-        self._player1 = Player(player1)
-        self._player2 = Player(player2)
+        self._players = (player1: Player(player1), player2: Player(player2))
         self._game_winner = None
         self._current_turn = None
 
@@ -62,6 +64,8 @@ class KubaGame:
     def display_board(self):
         '''
         Displays the game board in a console friendly format for debugging purposes.
+
+        Also includes basic information of the game state.
         '''
         for row in self._board:
             print(row)
@@ -80,9 +84,137 @@ class KubaGame:
         that is being pushed, and the direction to push as a string ('L' is left, 'R' is
         right, 'F' is forward, and 'B' is back.)
 
+        If the move is valid, the game board is updated to reflect the move. If a red marbles is
+        captured, the player's captured_red_marbles is incremented by 1. If the move wins the game, the
+        the internal self._game_winner variable is updated accordingly.
+
         If for any reason the move is not valid, False is returned, otherwise True.
         '''
+
         pass
+
+    def _validate_move(self, playername, coordinates, direction):
+        '''
+        Takes the specified player name as a string, the coordinates as a tuple of the marble
+        that is being pushed, and the direction to push as a string ('L' is left, 'R' is
+        right, 'F' is forward, and 'B' is back.)
+
+        If the move is valid, True is returned.
+
+        False is returned if any of the following conditions are met:
+            - It is not the specified player's turn.
+            - If there is already a winner.
+            - If the color of the marble at the specified coordinate is not the color for the specified
+            player.
+            - If the marble is not 'open' to be pushed.
+            - If the Ko rule is violated.
+            - If the move would push the own player's marble off the board.
+        '''
+
+        # Check if it's the player's turn.
+        if playername != self._current_turn:
+            return False
+        
+        # Check if there's a winner.
+        if self._game_winner is not None:
+            return False
+        
+        # Check that the color of the selected marble is the player's chosen color.
+        if self._players[playername].get_color() != self.get_marble(coordinates):
+            return False
+        
+        # Check that the marble to be moved is 'open'.
+        if not self._check_open_marble(coordinates, direction):
+            return False
+        
+        # Check that the Ko rule isn't violated.
+        if not self._check_ko_rule(coordinates, direction):
+            return False
+
+        # Check if the move will knock off the player's own marble.
+        if not self._check_selfdefeating_rule(playername, coordinates, direction):
+            return False
+        
+        return True
+
+    def _check_open_marble(self, coordinates, direction):
+        '''
+        Takes the coordinates as a tuple of the marble that is being pushed, and the direction to push as a string ('L' is left, 'R' is
+        right, 'F' is forward, and 'B' is back.)
+
+        If the marble is 'open' and can be pushed, True is returned, otherwise False is returned.
+        '''
+
+        if direction == "F":
+            try:
+                blocking_spot = (coordinates[0] + 1, coordinates[1])
+            except IndexError:
+                return True
+        elif direction == "B":
+            try:
+                blocking_spot = (coordinates[0] - 1, coordinates[1])
+            except IndexError:
+                return True
+        elif direction == "L":
+            try:
+                blocking_spot = (coordinates[0], coordinates[1] + 1)
+            except IndexError:
+                return True
+        else:
+            try:
+                blocking_spot = (coordinates[0], coordinates[1] - 1)
+            except IndexError:
+                return True
+        
+
+        if self.get_marble(blocking_spot) == "X":
+            return True
+        else:
+            return False
+
+    def _check_ko_rule(self, coordinates, direction):
+        '''
+        Takes the coordinates as a tuple of the marble that is being pushed, and the direction to push as a string ('L' is left, 'R' is
+        right, 'F' is forward, and 'B' is back.)
+
+        If the Ko rule is not violated, True is returned, otherwise False is returned.
+        '''
+
+        previous_board = deepcopy(self._board)
+
+        # Under Construction
+
+    def _check_selfdefeating_rule(self, playername, coordinates, direction):
+        '''
+        Takes the specified player name as a string, the coordinates as a tuple of the marble
+        that is being pushed, and the direction to push as a string ('L' is left, 'R' is
+        right, 'F' is forward, and 'B' is back.)
+
+        Determines whether the move removes one of the player's own marbles from the board.
+
+        Returns True if the rule is not violated and False otherwise.
+        '''
+
+        last_marble_index = None
+
+        if direction == "F":
+            
+            row = coordinates[0]
+            current_marble = self.get_marble(coordinates)
+            
+            while current_marble != "X" and row > 0:
+                row -= 1
+                current_marble = self.get_marble((row, coordinates[1]))
+
+            if row
+
+        elif direction == "B":
+            
+        elif direction == "L":
+            
+        else:
+            
+
 
     def get_winner(self):
         '''
@@ -97,23 +229,36 @@ class KubaGame:
         player.
         '''
 
-        if self._player1.get_name() == playername:
-            return self._player1.get_captured_red_marbles()
-        else:
-            return self._player2.get_captured_red_marbles()
+        return self._players[playername].get_captured_red_marbles()
 
     def get_marble(self, coordinates):
         '''
-        Takes coordinates as a tuple and returns the marble that is present at the specified
-        location.
+        Takes coordinates as a tuple and returns the marble that is present at the specified location
+        as R (red), B (black), and W (white). If there is no marble at the specified location, 'X" is
+        returned.
         '''
-        pass
+        
+        return self._board[coordinates[0], coordinates[1]]
 
     def get_marble_count(self):
         '''
         Returns the number of White, Black, and Red marbles on the board as a tuple in the order (W,B,R).
         '''
-        pass
+        
+        white = 0
+        black = 0
+        red = 0
+
+        for row in self._board:
+            for marble in row:
+                if marble == "R":
+                    red += 1
+                elif marble == "B":
+                    black += 1
+                elif marble == "W":
+                    white += 1
+        
+        return (white, black, red)
 
 
 class Player:
@@ -146,6 +291,13 @@ class Player:
         '''
 
         return self._name
+
+    def get_color(self):
+        '''
+        Returns the color of the player's chosen marble.
+        '''
+
+        return self._color
 
     def increment_captured_red_marbles(self):
         '''
