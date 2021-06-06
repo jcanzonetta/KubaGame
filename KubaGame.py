@@ -69,12 +69,13 @@ class KubaGame:
 
         Also includes basic information of the game state.
         '''
-        
+
         print()
         print("Captured Red Marbles")
-        
+
         for player in self._players:
-            print(player + ": " + str(self._players[player].get_captured_red_marbles()))
+            print(player + ": " +
+                  str(self._players[player].get_captured_red_marbles()))
 
         print()
         print("Number of Marbles on Board")
@@ -84,18 +85,20 @@ class KubaGame:
         for color in self.get_marble_count():
             print(color_tuple[counter] + str(color))
             counter += 1
-
+        print()
+        print("Current Turn: " + self._current_turn)
+        print()
         print("-----------------")
         for row in self._game_board:
-            
-            print("|", end = " ")
-            
+
+            print("|", end=" ")
+
             for marble in row:
-                print(marble, end = " ")
+                print(marble, end=" ")
             print("|")
         print("-----------------")
         print()
-    
+
     def get_current_turn(self):
         '''
         Returns the player name whose turn it is to play the game. If the game hasn't started yet,
@@ -231,12 +234,12 @@ class KubaGame:
         for index in blocking_spot:
             if index < 0 or index > 6:
                 return True
-                
+
         if self.get_marble(blocking_spot) == "X":
             return True
         else:
             return False
-        
+
     def _check_ko_rule(self, playername, coordinates, direction):
         '''
         Takes the coordinates as a tuple of the marble that is being pushed, and the direction to push as a string ('L' is left, 'R' is
