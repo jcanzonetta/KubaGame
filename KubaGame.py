@@ -203,7 +203,7 @@ class KubaGame:
             return False
 
         # Check that the Ko rule isn't violated.
-        if not self._check_ko_rule(playername, coordinates, direction):
+        if not self._check_ko_rule(coordinates, direction):
             #print("the ko rule is violated")
             return False
 
@@ -240,7 +240,7 @@ class KubaGame:
         else:
             return False
 
-    def _check_ko_rule(self, playername, coordinates, direction):
+    def _check_ko_rule(self, coordinates, direction):
         '''
         Takes the coordinates as a tuple of the marble that is being pushed, and the direction to push as a string ('L' is left, 'R' is
         right, 'F' is forward, and 'B' is back.)
@@ -342,7 +342,7 @@ class KubaGame:
 
         return board
 
-    def _check_selfdefeating_rule(self, playername, coordinates, direction, board=None):
+    def _check_selfdefeating_rule(self, playername, coordinates, direction):
         '''
         Takes the specified player name as a string, the coordinates as a tuple of the marble
         that is being pushed, and the direction to push as a string ('L' is left, 'R' is
@@ -352,20 +352,18 @@ class KubaGame:
 
         Returns True if the rule is not violated and False otherwise.
         '''
-        if board is None:
-            board = self._game_board
 
         player_marble_color = self._players[playername].get_color()
 
         row = coordinates[0]
         column = coordinates[1]
-        current_marble = board[row][column]
+        current_marble = self._game_board[row][column]
 
         if direction == "F":
 
             while current_marble != "X":
                 row -= 1
-                current_marble = board[row][column]
+                current_marble = self._game_board[row][column]
 
                 if row == 0:
                     if current_marble == player_marble_color:
@@ -377,7 +375,7 @@ class KubaGame:
 
             while current_marble != "X":
                 row += 1
-                current_marble = board[row][column]
+                current_marble = self._game_board[row][column]
 
                 if row == 6:
                     if current_marble == player_marble_color:
@@ -389,7 +387,7 @@ class KubaGame:
 
             while current_marble != "X":
                 column -= 1
-                current_marble = board[row][column]
+                current_marble = self._game_board[row][column]
 
                 if column == 0:
                     if current_marble == player_marble_color:
@@ -401,7 +399,7 @@ class KubaGame:
 
             while current_marble != "X":
                 column += 1
-                current_marble = board[row][column]
+                current_marble = self._game_board[row][column]
 
                 if column == 6:
                     if current_marble == player_marble_color:
@@ -426,19 +424,16 @@ class KubaGame:
 
         return self._players[playername].get_captured_red_marbles()
 
-    def get_marble(self, coordinates, board=None):
+    def get_marble(self, coordinates):
         '''
         Takes coordinates as a tuple and returns the marble that is present at the specified location
         as R (red), B (black), and W (white). If there is no marble at the specified location, 'X" is
         returned.
         '''
 
-        if board is None:
-            return self._game_board[coordinates[0]][coordinates[1]]
-        else:
-            return board[coordinates[0]][coordinates[1]]
+        return self._game_board[coordinates[0]][coordinates[1]]
 
-    def get_marble_count(self, board=None):
+    def get_marble_count(self):
         '''
         Returns the number of White, Black, and Red marbles on the board as a tuple in the order (W,B,R).
         '''
@@ -447,10 +442,7 @@ class KubaGame:
         black = 0
         red = 0
 
-        if board is None:
-            board = self._game_board
-
-        for row in board:
+        for row in self._game_board:
             for marble in row:
                 if marble == "R":
                     red += 1
