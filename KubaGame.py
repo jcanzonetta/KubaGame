@@ -89,7 +89,7 @@ class KubaGame:
         try:
             print("Current Turn: " + self._current_turn)
         except TypeError:
-            print("It's 'no one's' turn.")
+            print("Anyone's turn.")
         print()
         print("-----------------")
         for row in self._game_board:
@@ -182,17 +182,17 @@ class KubaGame:
         '''
 
         possible_directions = ('F', 'B', 'L', 'R')
-        
+
         playername = self._get_other_playername(playername)
         marble_color = self._players[playername].get_color()
 
-        for i,row in enumerate(self._game_board):
-            for j,marble in enumerate(row):
+        for i, row in enumerate(self._game_board):
+            for j, marble in enumerate(row):
                 if self._game_board[i][j] == marble_color:
                     for direction in possible_directions:
                         if self._validate_move(playername, (i, j), direction):
                             return False
-        
+
         return True
 
     def _validate_move(self, playername, coordinates, direction):
