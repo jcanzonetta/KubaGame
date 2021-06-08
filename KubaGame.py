@@ -59,10 +59,12 @@ class KubaGame:
         # Add red squares.
         red_coordinates = [(1, 3), (2, 2), (2, 3), (2, 4), (3, 1), (3, 2),
                            (3, 3), (3, 4), (3, 5), (4, 2), (4, 3), (4, 4), (5, 3)]
-
         for marble in red_coordinates:
             self._game_board[marble[0]][marble[1]] = "R"
 
+        # Initialize deep copy board to maintain the state of the board before the opposing player's move.
+        self._game_board_previous = deepcopy(self._game_board)
+        
     def display_board(self):
         '''
         Displays the game board in a console friendly format for debugging purposes.
@@ -124,6 +126,8 @@ class KubaGame:
         '''
 
         if self._validate_move(playername, coordinates, direction):
+
+            self._game_board_previous = deepcopy(self._game_board)
 
             self._move_marble(playername, coordinates, direction, None)
 
@@ -233,14 +237,14 @@ class KubaGame:
             #print("the marble isn't open")
             return False
 
-        # Check that the Ko rule isn't violated.
-        if not self._check_ko_rule(coordinates, direction):
-            #print("the ko rule is violated")
-            return False
-
         # Check if the move will knock off the player's own marble.
         if not self._check_selfdefeating_rule(playername, coordinates, direction):
             #print("that move will knock the own player's marble off")
+            return False
+
+        # Check that the Ko rule isn't violated.
+        if not self._check_ko_rule(coordinates, direction):
+            #print("the ko rule is violated")
             return False
 
         return True
@@ -279,20 +283,15 @@ class KubaGame:
         If the Ko rule is not violated, True is returned, otherwise False is returned.
         '''
 
-        previous_board = deepcopy(self._game_board)
+        temporary_board = deepcopy(self._game_board)
 
-        previous_board = self._move_marble(
-            None, coordinates, direction, previous_board)
+        temporary_board = self._move_marble(
+            None, coordinates, direction, temporary_board)
 
-        row_index = 0
-        for row in previous_board:
-
-            col_index = 0
-            for marble in row:
-                if marble != self.get_marble((row_index, col_index)):
+        for row_index,row in enumerate(temporary_board):
+            for col_index,marble in enumerate(row):
+                if marble != self._game_board_previous[row_index][col_index]:
                     return True
-                col_index += 1
-        row_index += 1
 
         return False
 
