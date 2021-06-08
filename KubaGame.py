@@ -127,11 +127,11 @@ class KubaGame:
 
         if self._validate_move(playername, coordinates, direction):
 
+            # Save the game board for later reference while checking the Ko rule.
             self._game_board_previous = deepcopy(self._game_board)
 
             self._move_marble(playername, coordinates, direction, None)
 
-            # Update current turn.
             self._current_turn = self._get_other_playername(playername)
 
             if self._check_for_winner(playername):
@@ -219,32 +219,26 @@ class KubaGame:
 
         # Check if it's the player's turn.
         if not (playername == self._current_turn or self._current_turn is None):
-            #print("not the player's turn")
             return False
 
         # Check if there's a winner.
         if self._game_winner is not None:
-            #print("there is already a winner")
             return False
 
         # Check that the color of the selected marble is the player's chosen color.
         if self._players[playername].get_color() != self.get_marble(coordinates):
-            #print("the selected marble is not the player's marble")
             return False
 
         # Check that the marble to be moved is 'open'.
         if not self._check_open_marble(coordinates, direction):
-            #print("the marble isn't open")
             return False
 
         # Check if the move will knock off the player's own marble.
         if not self._check_selfdefeating_rule(playername, coordinates, direction):
-            #print("that move will knock the own player's marble off")
             return False
 
         # Check that the Ko rule isn't violated.
         if not self._check_ko_rule(coordinates, direction):
-            #print("the ko rule is violated")
             return False
 
         return True
@@ -316,7 +310,6 @@ class KubaGame:
         board[row][column] = "X"
 
         if direction == "F":
-
             while current_marble != "X":
                 row -= 1
 
@@ -343,7 +336,6 @@ class KubaGame:
                     current_marble = "X"
 
         elif direction == "L":
-
             while current_marble != "X":
                 column -= 1
 
@@ -356,8 +348,7 @@ class KubaGame:
                         self._players[playername].increment_captured_red_marbles()
                     current_marble = "X"
 
-        else:
-
+        elif direction == "R":
             while current_marble != "X":
                 column += 1
 
@@ -431,7 +422,7 @@ class KubaGame:
                     else:
                         current_marble = "X"
 
-        else:
+        elif direction == "R":
             if column == 6 and current_marble == player_marble_color:
                 return False
 
