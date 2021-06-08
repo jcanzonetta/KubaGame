@@ -64,7 +64,7 @@ class KubaGame:
 
         # Initialize deep copy board to maintain the state of the board before the opposing player's move.
         self._game_board_previous = deepcopy(self._game_board)
-        
+
     def display_board(self):
         '''
         Displays the game board in a console friendly format for debugging purposes.
@@ -288,8 +288,8 @@ class KubaGame:
         temporary_board = self._move_marble(
             None, coordinates, direction, temporary_board)
 
-        for row_index,row in enumerate(temporary_board):
-            for col_index,marble in enumerate(row):
+        for row_index, row in enumerate(temporary_board):
+            for col_index, marble in enumerate(row):
                 if marble != self._game_board_previous[row_index][col_index]:
                     return True
 
@@ -388,7 +388,7 @@ class KubaGame:
         row = coordinates[0]
         column = coordinates[1]
         current_marble = self._game_board[row][column]
-        
+
         if direction == "F":
             if row == 0 and current_marble == player_marble_color:
                 return False
@@ -434,7 +434,7 @@ class KubaGame:
         else:
             if column == 6 and current_marble == player_marble_color:
                 return False
-                
+
             while current_marble != "X":
                 column += 1
                 current_marble = self._game_board[row][column]
