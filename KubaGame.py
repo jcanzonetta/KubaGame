@@ -1,8 +1,8 @@
 # Author: Justin Canzonetta
 # Date: 5/20/2021
 # Description:  Implementation of the game "Kuba". Kuba is won by either capturing 7 of the neutral red
-#               marbles or by blocking your oppoenent from any remaining moves. The board can be
-#               displayed in the console for debug purposes.
+#               marbles or by blocking your opponent from any remaining moves. Marbles can only be pushed
+#               if there is no marble directly in front of where it is pushed from.
 
 from copy import deepcopy
 
