@@ -86,7 +86,10 @@ class KubaGame:
             print(color_tuple[counter] + str(color))
             counter += 1
         print()
-        print("Current Turn: " + self._current_turn)
+        try:
+            print("Current Turn: " + self._current_turn)
+        except TypeError:
+            print("It's 'no one's' turn.")
         print()
         print("-----------------")
         for row in self._game_board:
@@ -125,9 +128,7 @@ class KubaGame:
             self._move_marble(playername, coordinates, direction, None)
 
             # Update current turn.
-            for key in self._players:
-                if key != playername:
-                    self._current_turn = key
+            self._current_turn = self._get_other_playername(playername)
 
             if self._check_for_winner(playername):
                 self._game_winner = playername
@@ -135,6 +136,15 @@ class KubaGame:
             return True
         else:
             return False
+
+    def _get_other_playername(self, playername):
+        '''
+        Takes a player name as a parameter and returns the name of the other player.
+        '''
+
+        for key in self._players:
+            if key != playername:
+                return key
 
     def _check_for_winner(self, playername):
         '''
@@ -159,10 +169,31 @@ class KubaGame:
             if self.get_marble_count()[1] < 1:
                 return True
 
-        # Check if the next player’s colored marbles, checking if a move in any direction is valid.
-        # If the next player has no valid moves, the recent player is declared the winner. (optiona)
+        # If the next player has no valid moves, the recent player is declared the winner. (optional)
+        if self._check_all_moves_blocked(playername):
+            return True
 
         return False
+
+    def _check_all_moves_blocked(self, playername):
+        '''
+        Takes a player name and checks if the opposing player has any valid moves left. If all moves are
+        blocked, True is returned. False is returned otherwise.
+        '''
+
+        possible_directions = ('F', 'B', 'L', 'R')
+        
+        playername = self._get_other_playername(playername)
+        marble_color = self._players[playername].get_color()
+
+        for i,row in enumerate(self._game_board):
+            for j,marble in enumerate(row):
+                if self._game_board[i][j] == marble_color:
+                    for direction in possible_directions:
+                        if self._validate_move(playername, (i, j), direction):
+                            return False
+        
+        return True
 
     def _validate_move(self, playername, coordinates, direction):
         '''
