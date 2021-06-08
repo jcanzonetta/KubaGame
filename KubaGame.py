@@ -388,8 +388,10 @@ class KubaGame:
         row = coordinates[0]
         column = coordinates[1]
         current_marble = self._game_board[row][column]
-
+        
         if direction == "F":
+            if row == 0 and current_marble == player_marble_color:
+                return False
 
             while current_marble != "X":
                 row -= 1
@@ -402,6 +404,8 @@ class KubaGame:
                         current_marble = "X"
 
         elif direction == "B":
+            if row == 6 and current_marble == player_marble_color:
+                return False
 
             while current_marble != "X":
                 row += 1
@@ -414,6 +418,8 @@ class KubaGame:
                         current_marble = "X"
 
         elif direction == "L":
+            if column == 0 and current_marble == player_marble_color:
+                return False
 
             while current_marble != "X":
                 column -= 1
@@ -426,7 +432,9 @@ class KubaGame:
                         current_marble = "X"
 
         else:
-
+            if column == 6 and current_marble == player_marble_color:
+                return False
+                
             while current_marble != "X":
                 column += 1
                 current_marble = self._game_board[row][column]
